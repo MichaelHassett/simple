@@ -182,6 +182,21 @@
 
 </style>
 
+
+<style>
+  /* Sound buttons: make them look clickable without adding clutter */
+  .phChip, .soundChip, .chip, button.phChip, button.soundChip, #phChips button {
+    border: 1px solid rgba(5, 74, 116, 0.20) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+    padding: 10px 14px !important;
+    border-radius: 14px !important;
+    font-weight: 600 !important;
+  }
+  .phChip:active, .soundChip:active, .chip:active, #phChips button:active {
+    transform: scale(0.98);
+  }
+</style>
+
 </head>
 <body class="theme-hi size-normal mode-caregiver">
 <script>
@@ -3638,6 +3653,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
       <div id="word" class="word">Loading…</div>
       <div id="phonetic" class="phonetic"></div>
       <div id="chips" class="chips"></div>
+<div id="soundHint" style="margin-top:8px;font-size:14px;color:#5b6470;">Tap a sound to see the mouth picture.</div>
 
       <div class="row" style="margin-top:8px;">
         <button id="listenBtn" type="button">🔊 Listen</button>
@@ -3770,9 +3786,9 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
 
   const TUTORIAL = [
     {title:'Welcome', text:'Simple helps you practice words and makes sounds easier to feel.', icon:'🙂'},
-    {title:'Listen', text:'Tap Listen to hear the word.', icon:'🔊'},
+    {title:'Listen', text:'Tap Listen to hear the word. Tap Speak to practice saying it.', icon:'🔊 🎤'},
     {title:'Slow', text:'Tap Slow to hear it slower.', icon:'🐢'},
-    {title:'Choose words', text:'Beginners = easy words. Advanced = longer words. Random = surprise.', icon:'🎲'},
+    {title:'Choose words', text:'Beginners = 1 syllable. Advanced = 2+ syllables.', icon:'🧠'},
     {title:'Practice 10', text:'Practice 10 gives 10 words. Auto goes to the next word every 10 seconds.', icon:'🎯'},
     {title:'Sound help', text:'Tap a sound button for mouth/tongue placement help.', icon:'👄'},
   ];
