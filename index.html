@@ -3928,10 +3928,10 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     }else{
       phDiagram.innerHTML=DIAGRAMS[info.cat] || DIAGRAMS.vowel;
     }
-    phHow.textContent=info.how || '';
-    phHint.textContent=info.ex ? ('Example: "' + info.ex + '"') : '';
-    phListen.onclick=()=>speak(info.ex || key, 1);
-    phSlow.onclick=()=>speak(info.ex || key, 0.6);
+    phHow.textContent=('Like "' + soundCue(key) + '".');
+    phHint.textContent=('Example: "' + soundCue(key) + '"');
+    phListen.onclick=()=>speak(soundCue(key), 1);
+    phSlow.onclick=()=>speak(soundCue(key), 0.6);
     phOverlay.classList.add('show');
   }
   function closePh(){ phOverlay.classList.remove('show'); }
@@ -3989,6 +3989,20 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     }catch(e){}
+  }
+
+  // Turn a sound code (ER, IH, NG) into a short cue that TTS will *try* to pronounce as a sound.
+  // (TTS differs by device/browser; this keeps it consistent and avoids speaking full example words.)
+  function soundCue(key){
+    const k=String(key||"").toUpperCase();
+    const map={
+      "ER":"er","R":"r","IH":"ih","IY":"ee","EH":"eh","AE":"a","AA":"ah","AH":"uh","AO":"aw",
+      "AW":"ow","AY":"eye","EY":"ay","OW":"oh","OY":"oy","UH":"uh","UW":"oo",
+      "CH":"ch","SH":"sh","TH":"th","DH":"th","ZH":"zh","NG":"ng","JH":"j",
+      "F":"f","V":"v","S":"s","Z":"z","P":"p","B":"b","M":"m","N":"n","T":"t","D":"d","K":"k","G":"g",
+      "L":"l","W":"w","Y":"y","HH":"h"
+    };
+    return map[k] || k.toLowerCase();
   }
   document.getElementById('listenBtn').addEventListener('click', ()=>{ const r=currentRow(); if(r) speak(r.word, 1); });
   document.getElementById('slowBtn').addEventListener('click', ()=>{ const r=currentRow(); if(r) speak(r.word, 0.6); });
