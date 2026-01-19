@@ -4018,7 +4018,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     phHow.textContent = info.how || ('Like "' + soundCue(key) + '".');
     phHint.textContent = 'Example: "' + (info.ex || soundCue(key)) + '"';
     phListen.onclick = () => speak(soundCue(key), 1);
-    phSlow.onclick = () => speak(soundCue(key), 0.15);
+    phSlow.onclick = () => speak(soundCue(key), 0.05);
     phOverlay.classList.add('show');
   }
   function closePh(){ phOverlay.classList.remove('show'); }
@@ -4092,7 +4092,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     return map[k] || k.toLowerCase();
   }
   document.getElementById('listenBtn').addEventListener('click', ()=>{ const r=currentRow(); if(r) speak(r.word, 1); });
-  document.getElementById('slowBtn').addEventListener('click', ()=>{ const r=currentRow(); if(r) speak(r.word, 0.6); });
+  document.getElementById('slowBtn').addEventListener('click', ()=>{ const r=currentRow(); if(r) speak(r.word, 0.05); });
 
   // Speech recognition (optional)
   const speechStatus=document.getElementById('speechStatus');
