@@ -4018,7 +4018,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     phHow.textContent = info.how || ('Like "' + soundCue(key) + '".');
     phHint.textContent = 'Example: "' + (info.ex || soundCue(key)) + '"';
     phListen.onclick = () => speak(soundCue(key), 1);
-    phSlow.onclick = () => speak(soundCue(key), 0.6);
+    phSlow.onclick = () => speak(soundCue(key), 0.15);
     phOverlay.classList.add('show');
   }
   function closePh(){ phOverlay.classList.remove('show'); }
