@@ -3778,17 +3778,18 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
       <button id="tipClose" type="button" class="closeBtn">✖ Close</button>
     </div>
     <div style="font-size:16px; line-height:1.35; margin:6px 0 10px 0;">
-      Simple is <b>free</b> (no ads, no account). Tips are <b>optional</b> and help support development.
+      Simple is <b>free</b> (no ads, no account). Donations are <b>optional</b> and help support development.
       <div style="margin-top:6px; opacity:0.85;">No features are unlocked — just a thank you ❤️</div>
     </div>
     <div class="row" style="gap:10px; flex-wrap:wrap; justify-content:center; margin-top:8px;">
-      <button id="tipBtn1" type="button" data-sku="tip_1">Tip (loading…)</button>
-      <button id="tipBtn3" type="button" data-sku="tip_3">Tip (loading…)</button>
-      <button id="tipBtn5" type="button" data-sku="tip_5">Tip (loading…)</button>
+      <button id="tipBtn1" type="button" data-sku="tip_1">Donation (loading…)</button>
+      <button id="tipBtn3" type="button" data-sku="tip_3">Donation (loading…)</button>
+      <button id="tipBtn5" type="button" data-sku="tip_5">Donation (loading…)</button>
+      <button id="tipBtn10" type="button" data-sku="tip_5">Donation (loading…)</button>
     </div>
     <div id="tipStatus" style="margin-top:12px; text-align:center; font-size:14px; opacity:0.9;"></div>
     <div style="margin-top:10px; font-size:13px; opacity:0.75; text-align:center;">
-      Tips are processed securely by Google Play.
+      Donations are processed securely by Google Play.
     </div>
   </div>
 </div>
@@ -3922,6 +3923,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     document.getElementById('tipBtn1'),
     document.getElementById('tipBtn3'),
     document.getElementById('tipBtn5'),
+    document.getElementById('tipBtn10'),
   ].filter(Boolean);
 
   function openTip(){ if(tipOverlay) tipOverlay.classList.add('show'); }
@@ -3938,7 +3940,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
 
   // Default (web / before store loads)
   setTipButtonsEnabled(false);
-  tipButtons.forEach((btn)=>{ btn.textContent = 'Tip (available on Android)'; });
+  tipButtons.forEach((btn)=>{ btn.textContent = 'Donate (available on Android)'; });
 
   function getProductPriceLabel(p){
     // Try a few common fields across plugin versions
@@ -3959,28 +3961,28 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
       const sku = btn.getAttribute('data-sku');
       const p = window.store.get ? window.store.get(sku) : null;
       const price = getProductPriceLabel(p);
-      btn.textContent = price ? `❤️ Tip ${price}` : '❤️ Tip';
+      btn.textContent = price ? `❤️ Donate ${price}` : '❤️ Donate';
     });
   }
 
   function initTipStore(){
     const store = window.store;
     if(!store) {
-      setTipStatus('Tips are available on the Android Play Store version.');
+      setTipStatus('Donations are available on the Android Play Store version.');
       return;
     }
 
     // Register products (consumables)
-    const SKUS = ['tip_1','tip_3','tip_5'];
+    const SKUS = ['tip_1','tip_3','tip_5','tip_10'];
     try {
       SKUS.forEach((id)=>{
         store.register({ id, type: store.CONSUMABLE, platform: store.ANDROID_PLATFORM });
       });
     } catch(e) {
-      console.warn('Tip register failed', e);
+      console.warn('Donate register failed', e);
     }
 
-    store.error((e)=>{ console.error('IAP error', e); setTipStatus('Tip purchase unavailable right now.'); });
+    store.error((e)=>{ console.error('IAP error', e); setTipStatus('Donations purchase unavailable right now.'); });
 
     // When a purchase is approved, finish it (acknowledge) and thank the user
     store.when('product').approved((p)=>{
@@ -3989,7 +3991,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     });
 
     store.ready(()=>{
-      setTipStatus('Choose an optional tip amount. Thank you!');
+      setTipStatus('Choose an optional donation amount. Thank you!');
       setTipButtonsEnabled(true);
       refreshTipLabels();
     });
