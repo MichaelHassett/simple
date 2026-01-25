@@ -142,6 +142,14 @@
     box-shadow: 0 8px 18px rgba(0,0,0,.10);
   }
 
+
+/* Requests modal */
+.reqRow{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
+.reqLabel{font-weight:700;color:#233;}
+.reqInput,.reqTextarea{width:100%;border:2px solid #cfd8e3;border-radius:14px;padding:10px 12px;font-size:16px;background:#fff;}
+.reqTextarea{resize:vertical;min-height:120px;}
+.reqHint{margin-top:8px;font-size:13px;color:#556;line-height:1.35;}
+.reqActions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;}
 </style>
 
 <style>
@@ -3662,6 +3670,7 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     <!-- Optional Support (Google Play Billing on Android) -->
     <div class="homeBottomSupport">
       <button id="tipHomeBtn" type="button" class="supportMini">❤️ Support</button>
+      <button id="reqHomeBtn" type="button" class="supportMini">📝 Requests</button>
     </div>
 
   </div>
@@ -4297,7 +4306,45 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
     <div id="tipStatus" class="mini" style="margin-top:10px;"></div>
     <div class="mini" style="margin-top:8px;">Payments are processed securely by Google Play.</div>
   </div>
+  <!-- Requests Modal (sends to simplerecoverylabs@gmail.com) -->
+  
+
 </div>
+
+<div id="reqOverlay" class="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reqTitle">
+      <div class="modalHeader">
+        <div class="modalTitle" id="reqTitle">Requests</div>
+        <button class="closeBtn" id="reqCloseBtn" type="button">✕ Close</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="reqRow">
+          <label class="reqLabel" for="reqType">Type</label>
+          <select id="reqType" class="reqInput">
+            <option value="Word request">Word request</option>
+            <option value="Name request">Name request</option>
+            <option value="Feedback">Feedback</option>
+          </select>
+        </div>
+
+        <div class="reqRow">
+          <label class="reqLabel" for="reqText">Your request</label>
+          <textarea id="reqText" class="reqTextarea" rows="5" placeholder="Example: Please add the name Kiley. Or: Add more 2-syllable beginner words. Or: The sound buttons are hard to notice on mobile."></textarea>
+        </div>
+
+        <div class="reqHint">
+           <div class="reqHint" id="reqStatusLine">Tap <b>Send</b>.</div>
+
+        <div class="reqActions">
+          <button id="reqCopyBtn" type="button" class="pillBtn">📋 Copy</button>
+          <button id="reqSendBtn" type="button" class="pillBtn primaryBtn">📨 Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
 <!-- SPEAK IS THERAPY TIP -->
 <div id="speakTipOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Speak is therapy">
@@ -4348,7 +4395,118 @@ Tapestry,TAP-uh-stree,T AE  P AH  S T R IY
   }
 
   if(tipHomeBtn) tipHomeBtn.addEventListener('click', openTip);
-  if(tipClose) tipClose.addEventListener('click', closeTip);
+
+  // Requests modal (opens Gmail compose in browser; no email-app required)
+  function toast(msg){
+    try{
+      let el=document.getElementById('simpleToast');
+      if(!el){
+        el=document.createElement('div');
+        el.id='simpleToast';
+        el.style.position='fixed';
+        el.style.left='50%';
+        el.style.bottom='18px';
+        el.style.transform='translateX(-50%)';
+        el.style.background='rgba(10,20,30,0.88)';
+        el.style.color='#fff';
+        el.style.padding='10px 14px';
+        el.style.borderRadius='14px';
+        el.style.fontSize='14px';
+        el.style.zIndex='99999';
+        el.style.maxWidth='92vw';
+        el.style.textAlign='center';
+        el.style.display='none';
+        document.body.appendChild(el);
+      }
+      el.textContent=msg;
+      el.style.display='block';
+      clearTimeout(window.__toastT);
+      window.__toastT=setTimeout(()=>{el.style.display='none';}, 2200);
+    }catch(e){alert(msg);}
+  }
+
+  const reqOverlay = document.getElementById('reqOverlay');
+  const reqHomeBtn = document.getElementById('reqHomeBtn');
+  const reqCloseBtn = document.getElementById('reqCloseBtn');
+  const reqType = document.getElementById('reqType');
+  const reqText = document.getElementById('reqText');
+  const reqCopyBtn = document.getElementById('reqCopyBtn');
+  const reqSendBtn = document.getElementById('reqSendBtn');
+
+  function openRequests(){
+    if(!reqOverlay) return;
+    reqOverlay.style.display = 'flex';
+    reqOverlay.setAttribute('aria-hidden','false');
+    // focus textbox for quick typing
+    setTimeout(()=>{ try{ reqText && reqText.focus(); }catch(e){} }, 50);
+  }
+  function closeRequests(){
+    if(!reqOverlay) return;
+    reqOverlay.style.display = 'none';
+    reqOverlay.setAttribute('aria-hidden','true');
+  }
+
+  if(reqHomeBtn) reqHomeBtn.addEventListener('click', openRequests);
+  if(reqCloseBtn) reqCloseBtn.addEventListener('click', closeRequests);
+  if(reqOverlay) reqOverlay.addEventListener('click', (e)=>{ if(e.target===reqOverlay) closeRequests(); });
+
+  if(reqCopyBtn) reqCopyBtn.addEventListener('click', async ()=>{
+    const msg = buildRequestMessage();
+    try{
+      await navigator.clipboard.writeText(msg);
+      toast('Copied. Paste into email or notes.');
+    }catch(e){
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = msg; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); toast('Copied.'); }catch(_e){}
+      document.body.removeChild(ta);
+    }
+  });
+
+  function buildRequestMessage(){
+    const type = (reqType && reqType.value) ? reqType.value : 'Request';
+    const body = (reqText && reqText.value) ? reqText.value.trim() : '';
+    const mode = (window.__simpleMode || '').toString();
+    const word = (document.getElementById('bigWord')?.textContent || '').trim();
+    const parts = [];
+    parts.push(type);
+    parts.push('---');
+    if(body) parts.push(body);
+    parts.push('---');
+    if(word) parts.push('Current word: '+word);
+    if(mode) parts.push('Mode: '+mode);
+    parts.push('Sent from SIMPLE');
+    return parts.join('\n');
+  }
+
+  if(reqSendBtn) reqSendBtn.addEventListener('click', async ()=>{
+    const msg = buildRequestMessage();
+
+    // Prefer Web Share (mobile). This does NOT force an email app,
+    // but it lets the user pick the easiest option available.
+    if(navigator.onLine && navigator.share){
+      try{
+        await navigator.share({
+          title: 'SIMPLE request',
+          text: msg
+        });
+        setReqStatus('Sent ✅ Thank you.');
+        return;
+      }catch(e){
+        // user canceled or share failed -> fall through to copy
+      }
+    }
+
+    // Fallback: copy to clipboard
+    try{ await navigator.clipboard.writeText(msg); }catch(e){}
+    if(!navigator.onLine){
+      setReqStatus('No internet right now. Tap Copy.');
+    } else {
+      setReqStatus('Copied ✅ Thank you.');
+    }
+  });
+if(tipClose) tipClose.addEventListener('click', closeTip);
   if(tipOverlay) tipOverlay.addEventListener('click', (e)=>{ if(e.target===tipOverlay) closeTip(); });
 
   // Default label (web / before store loads)
